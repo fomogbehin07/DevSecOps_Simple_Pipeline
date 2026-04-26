@@ -4,7 +4,9 @@ import subprocess
 import pickle
 
 # 1. Hardcoded secret (SAST)
-API_KEY = "12345-SECRET-KEY"
+import os
+
+API_KEY = os.getenv("API_KEY")
 
 # 2. SQL Injection vulnerability (SAST)
 def get_user(username):
@@ -38,4 +40,5 @@ DEBUG = True
 if __name__ == "__main__":
     print("Running vulnerable app...")
     get_user("admin' OR '1'='1")
-    run_command("test")
+    run_command("test")query = f"SELECT * FROM users WHERE username = '{username}'"
+
