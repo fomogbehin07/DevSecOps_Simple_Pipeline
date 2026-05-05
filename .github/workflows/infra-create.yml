@@ -30,12 +30,10 @@ jobs:
       # STAGE 2: SAST (SonarCloud)
       # =========================
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          projectBaseDir: .
+        uses: SonarSource/sonarcloud-github-action@v3
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          with:
+        with:
           args: >
             -Dsonar.organization=fomogbehin07 \
             -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
