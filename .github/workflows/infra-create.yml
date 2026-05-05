@@ -23,15 +23,15 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            sonar-scanner \
+      - name: Run SonarCloud Scan
+        run: |
+            ${GITHUB_ACTION_PATH}/scripts/run-sonar-scanner-cli.sh \
             -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline \
             -Dsonar.organization=your_org \
             -Dsonar.sources=. \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=$SONAR_TOKEN
-
+            
       # STAGE 3: SCA (Dependency Scan)
       - name: SCA (Snyk)
         uses: snyk/actions/node@master
