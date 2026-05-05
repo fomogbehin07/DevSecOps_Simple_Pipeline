@@ -35,6 +35,11 @@ jobs:
           projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          with:
+          args: >
+            -Dsonar.organization=fomogbehin07 \
+            -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
+            -Dsonar.sources=.
 
       # =========================
       # STAGE 3: SCA (Snyk)
