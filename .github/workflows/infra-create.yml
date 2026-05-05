@@ -25,11 +25,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.organization=fomogbehin07 \
-            -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
-            -Dsonar.sources=.
-            -Dsonar.verbose=true
+            sonar-scanner \
+            -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline \
+            -Dsonar.organization=your_org \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN
 
       # STAGE 3: SCA (Dependency Scan)
       - name: SCA (Snyk)
