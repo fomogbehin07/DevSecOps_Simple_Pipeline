@@ -26,10 +26,12 @@ jobs:
       - name: Run SonarCloud Scan
         run: |
             ${GITHUB_ACTION_PATH}/scripts/run-sonar-scanner-cli.sh \
-            sonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
-            sonar.organization=fomogbehin07
-            sonar.sources=.
+            sonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline \
+            sonar.organization=fomogbehin07 \
+            sonar.sources=. \
             sonar.host.url=https://sonarcloud.io
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
             
       # STAGE 3: SCA (Dependency Scan)
       - name: SCA (Snyk)
