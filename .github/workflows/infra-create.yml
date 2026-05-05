@@ -1,31 +1,53 @@
-name: Terraform Deployment
+name: DevSecOps CI
 on: [push]
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  deploy:
+  security-scan:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Fetch Keys from Vault
-        uses: hashicorp/vault-action@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          url: http://54.177.18.90:8200
-          role: gh-actions-role
-          method: jwt
-          secrets: |
-            aws/creds/terraform-role access_key | AWS_ACCESS_KEY_ID ;
-            aws/creds/terraform-role secret_key | AWS_SECRET_ACCESS_KEY
+          fetch-depth: 0 # Needed for full history scans, but we'll use 'dir' for now
 
-      - uses: hashicorp/setup-terraform@v3
-      - run: terraform init
-      - run: terraform plan
-      - run: terraform apply -auto-approve
+      # STAGE 1: Secret Scanning
+      - name: Secret Scanning (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: dir --source . --verbose --exit-code 1
+
+      # STAGE 2: SAST (Code Analysis)
+      - name: SAST (Semgrep)
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
+
+      # STAGE 3: SCA (Dependency Scan)
+      - name: SCA (Snyk)
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --all-projects --severity-threshold=high
+
+      # STAGE 4: SBOM Generation
+      - name: SBOM Generation (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'cyclonedx'
+          output: 'sbom.json'
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-file
+          path: sbom.json
+
+      # STAGE 5: DAST (Live Scan)
+      - name: DAST (OWASP ZAP)
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'example.com' # Replace with your URL
