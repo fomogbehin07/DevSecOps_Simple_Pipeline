@@ -18,11 +18,17 @@ jobs:
         with:
           args: dir --source . --verbose --exit-code 1
 
-      # STAGE 2: SAST (Code Analysis)
-      - name: SAST (Semgrep)
-        uses: returntocorp/semgrep-action@v1
+      # STAGE 2: SAST (SonarQube)
+      - name: SAST (SonarQube)
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Skip this line if using SonarCloud
         with:
-          config: auto
+          args: >
+            -Dsonar.projectKey=my-devsecops-demo
+            -Dsonar.sources=src
+            -Dsonar.verbose=true
 
       # STAGE 3: SCA (Dependency Scan)
       - name: SCA (Snyk)
