@@ -28,7 +28,7 @@ jobs:
             -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.organization=fomogbehin07
-            -Dsonar.sources=src
+            -Dsonar.sources=.
             -Dsonar.verbose=true
 
       # STAGE 3: SCA (Dependency Scan)
