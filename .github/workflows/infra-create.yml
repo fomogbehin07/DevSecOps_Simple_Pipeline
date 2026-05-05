@@ -25,9 +25,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.organization=fomogbehin07
+            -sonar-scanner \
+            -Dsonar.organization=fomogbehin07 \
+            -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
             -Dsonar.sources=.
             -Dsonar.verbose=true
 
