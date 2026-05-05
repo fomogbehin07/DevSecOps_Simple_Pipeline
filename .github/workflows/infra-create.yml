@@ -1,16 +1,24 @@
 name: DevSecOps CI
-on: [push]
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+
     steps:
+      # ✅ Checkout
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Needed for full history scans, but we'll use 'dir' for now
+          fetch-depth: 0
 
-      # STAGE 1: Secret Scanning
+      # =========================
+      # STAGE 1: SECRET SCANNING
+      # =========================
       - name: Secret Scanning (Gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -18,22 +26,19 @@ jobs:
         with:
           args: dir --source . --verbose --exit-code 1
 
-      # STAGE 2: SAST (SonarQube)
-      - name: Run SonarCloud Scan
-        run: sonar-scanner
+      # =========================
+      # STAGE 2: SAST (SonarCloud)
+      # =========================
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: .
         env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Run SonarCloud Scan
-        run: |
-            ${GITHUB_ACTION_PATH}/scripts/run-sonar-scanner-cli.sh \
-            sonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline \
-            sonar.organization=fomogbehin07 \
-            sonar.sources=. \
-            sonar.host.url=https://sonarcloud.io
-        env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-            
-      # STAGE 3: SCA (Dependency Scan)
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # =========================
+      # STAGE 3: SCA (Snyk)
+      # =========================
       - name: SCA (Snyk)
         uses: snyk/actions/node@master
         env:
@@ -41,13 +46,15 @@ jobs:
         with:
           args: --all-projects --severity-threshold=high
 
-      # STAGE 4: SBOM Generation
+      # =========================
+      # STAGE 4: SBOM (Trivy)
+      # =========================
       - name: SBOM Generation (Trivy)
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          format: 'cyclonedx'
-          output: 'sbom.json'
+          scan-type: fs
+          format: cyclonedx
+          output: sbom.json
 
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
@@ -55,8 +62,10 @@ jobs:
           name: sbom-file
           path: sbom.json
 
-      # STAGE 5: DAST (Live Scan)
+      # =========================
+      # STAGE 5: DAST (ZAP)
+      # =========================
       - name: DAST (OWASP ZAP)
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: 'example.com' # Replace with your URL
+          target: 'https://example.com'
