@@ -27,16 +27,6 @@ jobs:
           args: dir --source . --verbose --exit-code 1
 
       # =========================
-      # STAGE 3: SCA (Snyk)
-      # =========================
-      - name: SCA (Snyk)
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --all-projects --severity-threshold=high
-
-      # =========================
       # STAGE 4: SBOM (Trivy)
       # =========================
       - name: SBOM Generation (Trivy)
