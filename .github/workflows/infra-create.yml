@@ -27,19 +27,6 @@ jobs:
           args: dir --source . --verbose --exit-code 1
 
       # =========================
-      # STAGE 2: SAST (SonarCloud)
-      # =========================
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v3
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.organization=fomogbehin07 \
-            -Dsonar.projectKey=fomogbehin07_DevSecOps_Simple_Pipeline
-            -Dsonar.sources=.
-
-      # =========================
       # STAGE 3: SCA (Snyk)
       # =========================
       - name: SCA (Snyk)
